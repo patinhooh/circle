@@ -258,7 +258,12 @@ int CTCPConnection::Connect (void)
 	case TCPStateSynSent:
 	case TCPStateSynReceived:
 		m_Event.Clear ();
-		m_Event.Wait ();
+		// m_Event.Wait ();
+		// XXX: Patched so it does not block indefinitely
+		if (m_Event.WaitWithTimeout(1000000)) // wait 1 second
+		{
+			m_nErrno = -NET_ERROR_CONNECTION_TIMED_OUT;
+		}
 		break;
 
 	case TCPStateEstablished:
